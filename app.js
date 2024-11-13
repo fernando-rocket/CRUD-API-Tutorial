@@ -31,3 +31,5 @@ mongoose.connect(process.env.MONGO_PATH)
 //npm i mongodb
 //npm i mongoose
 //npm i dotenv
+
+// add .env, .env.example, .gitignore(node_modules, .env)
