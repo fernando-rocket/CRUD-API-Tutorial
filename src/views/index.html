@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CRUD Com MVC</title>
+</head>
+<body>
+    <h1> Gerencimento de Produtos</h1>
+
+    <!-- CRIAR PRODUTO-->
+    <h2>Criar Produto</h2>
+    <form id="createForm">
+        <label for="nome">  Nome:   </label>
+        <input type="text" id="nome"  name="nome" required>
+
+        <label for="preco"> Preço:   </label>
+        <input type="number" id="preco"  name="preco" required>
+
+        <button type="submit"> Criar Produto </button>
+    </form>
+
+    <!-- ATUALIZAR PRODUTO-->
+
+    <h2>Atualizar Produto</h2>
+  <form id="updateForm">
+    <label for="updateId">Id do Produto:</label>
+    <input type="number" id="updateId" name="updateId" required />
+
+    <label for="preco">Nome:</label>
+    <input type="text" id="updateNome" name="updateNome" />
+
+    <label for="updatePreco">Preco:</label>
+    <input type="number" id="updatePreco" name="updatePreco" step="0.01" />
+
+    <button type="submit">Atualizar Produto</button>
+  </form>
+
+    <!-- LISTAR PRODUTO-->
+    <h2>Lista de Produtos</h2>
+    <button id="carregarProdutosBtn">  Carregar Produtos </button>
+
+    <table>
+        <thead>
+            <tr>
+                <th> ID </th>
+                <th> Nome </th>
+                <th> Preco </th>  
+                <th> Acoes </th>  
+
+            </tr>
+        </thead>
+        <tbody id="produtosTableBody">
+        </tbody>
+    </table>
+
+    <script>
+        //ENVIAR REQUISICAO PARA CRIAR PRODUTOS
+        document.getElementById('createForm').addEventListener('submit',
+            async function( e ){
+                e.preventDefault();
+
+                const nome = document.getElementById('nome').value;
+                const preco = document.getElementById('preco').value;
+
+                try {
+                    const response = await fetch('/api/produtos', { 
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ nome, preco })
+                    });
+
+                if(response.ok){
+                    alert('Produto criado com Sucesso!');
+                   // document.getElementById('createForm').reset();
+                   // ListarProdutos();                   
+                }else{
+                    console.log(nome, preco)
+                    alert('Erro ao criar produto. ');
+                }
+
+                } catch (error) {
+                    alert('Erro de comunicação com o servidor.');
+                    
+                }
+            });
+
+        // Enviar req para atualizar produtos
+        document.getElementById('updateForm').addEventListener('submit', async function(e){
+            e.preventDefault(e);
+
+            const id = document.getElementById('updateId').value;
+            const nome = document.getElementById('updateNome').value;
+            const preco = document.getElementById('updatePreco').value;
+
+            try {
+                const response = await fetch(`/api/produtos/${id}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json'},
+                    body: JSON.stringify({nome, preco})
+                })
+
+                if(response.ok){
+                    alert('Produto atualizado com sucesso!');
+                    document.getElementById('updateForm').reset();
+                    loadProducts();; // Atualiza lista de produtos
+                }else{
+                    alert('Erro ao atualizar produto');
+                }
+            } catch (error) {
+                alert('Erro de comunicação com o servidor');
+            }
+        });
+
+        // Enviar requisição para excluir produto
+        async function deleteProduct(id) {
+            try {
+                const response = await fetch(`/api/produtos/${id}`, {
+                    method: 'DELETE'
+                });
+
+                if (response.ok) {
+                    alert('Produto excluído com sucesso!');
+                    loadProducts(); // Atualiza a lista de produtos
+                } else {
+                    alert('Erro ao excluir produto.');
+                }
+            } catch (error) {
+                alert('Erro de comunicação com o servidor.');
+            }
+        }
+
+        // Carregar produtos da API
+        document.getElementById('carregarProdutosBtn').addEventListener('click', loadProducts);
+
+        async function loadProducts() {
+            const response = await fetch('/api/produtos');
+            const produtos = await response.json();
+
+            const tbody = document.getElementById('produtosTableBody');
+            tbody.innerHTML = ''; // Limpa a tabela antes de preencher
+
+            produtos.forEach(produto => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${produto.id}</td>
+                    <td>${produto.nome}</td>
+                    <td>${produto.preco}</td>
+                    <td class="actions">
+                        <button onclick="deleteProduct(${produto.id})">Excluir</button>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+
+    </script>
+
+
+</body>
+</html>
