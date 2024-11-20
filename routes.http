@@ -1,0 +1,21 @@
+GET http://localhost:3001/
+
+###
+
+POST http://localhost:3001/api/products/pizza/12/5.99
+Content-Type: application/json
+
+###
+
+PUT http://localhost:3001/api/products/6733fe9d47ac18eb44fdf526
+Content-Type: application/json
+
+{
+    "name": "pizza",
+    "quantity": 25,
+    "price": 2.99
+}
+
+###
+
+DELETE http://localhost:3001/api/products/6738dee4d0fd93a5a6404c50
